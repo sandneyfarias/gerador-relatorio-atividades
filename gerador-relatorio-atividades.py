@@ -1,52 +1,93 @@
-import subprocess
+import git
 import sys
 import os
-import re 
+import datetime
+from re import search
+
+def validateDate(date_text):
+    try:
+        datetime.datetime.strptime(date_text, '%Y-%m-%d')
+    except Exception as e:
+        raise Exception("Formato de data inválido, deve ser YYYY-MM-DD")
+
+def validateChave(chave):
+    if (chave.startswith("C") != True or len(chave) != 8):
+        raise Exception("Formato de chave inválido!")
+
 
 inputArgs = sys.argv
+
+dirpath = os.getcwd()
+foldername = os.path.basename(dirpath) + "/"
 arquivosNovos = []
 arquivosModificados = []
-dirpath = os.getcwd()
-foldername = os.path.basename(dirpath)
 
-for i in inputArgs[0:]:
-    result = subprocess.run(['git show '+i+' --name-status --pretty=oneline --abbrev-commit --diff-filter=A | awk \'{print $2}\' |  awk \'{if(NR>1)print}\''], capture_output=True, text=True,shell=True).stdout.splitlines()
-    if len(result) >0:
-        arquivosNovos = arquivosNovos + list(map(lambda x: foldername + '/' + x + '#' + i[0:8], result))
+g = git.Git(dirpath.replace("\\","/"))
 
-for i in inputArgs[0:]:
-    result = subprocess.run(['git show '+i+' --name-status --pretty=oneline --abbrev-commit --diff-filter=M | awk \'{print $2}\' |  awk \'{if(NR>1)print}\'' ], capture_output=True, text=True,shell=True).stdout.splitlines()
-    if len(result) >0:
-        arquivosModificados = arquivosModificados + list(map(lambda x: foldername + '/' + x + '#' + i[0:8], result))
+if (len(inputArgs) < 3):
+    print("É necessário informar da data inicial e chave C do usuário para filtrar os commits")
+else:
+    validateDate(inputArgs[1])
+    validateChave(inputArgs[2].upper())
 
-arquivosNovos = list(set(arquivosNovos))
-arquivosModificados = list(set(arquivosModificados))
-
-for novo in arquivosNovos:
     try:
-        arquivosModificados.remove(novo)
-    except ValueError:
-        pass
+        logCommits = g.log('--since=' + inputArgs[1] + 'T00:00:01', '--pretty=format:%H', '--author=' + inputArgs[2])
+        commitsList = logCommits.split('\n')
 
-arquivosNovos.sort(key=lambda f: os.path.splitext(f)[1])
-arquivosModificados.sort(key=lambda f: os.path.splitext(f)[1])
+        print("Coletando dados dos arquivos criados...")
+        for commit in commitsList:
+            loginfoAdicionados = g.execute(["git", "show", commit,"--name-status","--pretty=oneline","--abbrev-commit","--diff-filter=A"])
+            linhasAdicionados = loginfoAdicionados.split('\n')
 
+            if len(linhasAdicionados) > 0:
+                arquivosNovos = arquivosNovos + list(map(lambda x: foldername + x.replace('A\t','') + '#' + commit[0:8], linhasAdicionados))
 
-print('_______________Arquivos Novos_______________')
-extencaoAnterior = ''
-for x in arquivosNovos:
-    extencao = os.path.splitext(x)[1].split('#')[0]
-    if extencao != extencaoAnterior:
-        extencaoAnterior = extencao ;
-        print('##Arquivos com extencao ' + extencaoAnterior)
-    print(x)
+        print("Coletando dados dos arquivos modificados...")
+        for commit in commitsList:
+            loginfoModificados = g.execute(["git", "show", commit,"--name-status","--pretty=oneline","--abbrev-commit","--diff-filter=M"])
+            linhasModificados = loginfoModificados.split('\n')
 
+            if len(linhasModificados) > 0:
+                arquivosModificados = arquivosModificados + list(map(lambda x: foldername + x.replace('MM\t','').replace('M\t','') + '#' + commit[0:8], linhasModificados))
 
-print('_______________Arquivos Modificados_______________')
-extencaoAnterior = ''
-for x in arquivosModificados:
-    extencao = os.path.splitext(x)[1].split('#')[0]
-    if extencao != extencaoAnterior:
-        extencaoAnterior = extencao ;
-        print('##Arquivos com extencao ' + extencaoAnterior)
-    print(x)
+        arquivosNovosSet = set(arquivosNovos)
+        arquivosModificadosSet = set(arquivosModificados)
+
+        for novo in arquivosNovos:
+            arquivo = novo[:novo.index("#")]
+
+            if (arquivo != foldername and arquivo.find(".")):
+                iguais = set(filter(lambda nome: search(arquivo, nome), arquivosModificados))
+                try:
+                    arquivosModificadosSet = arquivosModificadosSet.difference(iguais)
+                except ValueError:
+                    pass
+
+        arquivosNovos = list(arquivosNovosSet)
+        arquivosModificados = list(arquivosModificadosSet)
+
+        arquivosNovos.sort(key=lambda f: os.path.splitext(f)[1])
+        arquivosModificados.sort(key=lambda f: os.path.splitext(f)[1])
+
+        print('_______________Arquivos Novos_______________')
+        extensaoAnterior = ''
+        for x in arquivosNovos:
+            extensao = os.path.splitext(x)[1].split('#')[0]
+            if extensao != extensaoAnterior:
+                extensaoAnterior = extensao;
+                print('##Arquivos com extensão ' + extensaoAnterior)
+            if (extensao != ""):
+                print(x.strip(" "))
+
+        print('_______________Arquivos Modificados_______________')
+        extensaoAnterior = ''
+        for x in arquivosModificados:
+            extensao = os.path.splitext(x)[1].split('#')[0]
+            if extensao != extensaoAnterior:
+                extensaoAnterior = extensao;
+                print('##Arquivos com extensão ' + extensaoAnterior)
+            if (extensao != ""):
+                print(x)
+
+    except Exception as e:
+      print("Ocorreu uma exceção durante a execução do programa, provavelmente o filtro informado não retornou dados")
