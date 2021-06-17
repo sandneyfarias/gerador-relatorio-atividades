@@ -28,10 +28,11 @@ if (len(inputArgs) < 3):
     print("É necessário informar da data inicial e chave C do usuário para filtrar os commits")
 else:
     validateDate(inputArgs[1])
-    validateChave(inputArgs[2].upper())
+    validateDate(inputArgs[2])
+    validateChave(inputArgs[3].upper())
 
     try:
-        logCommits = g.log('--since=' + inputArgs[1] + 'T00:00:01', '--pretty=format:%H', '--author=' + inputArgs[2])
+        logCommits = g.log('--after=' + inputArgs[1] + 'T00:00:01','--until=' + inputArgs[2] + 'T23:59:59', '--pretty=format:%H', '--author=' + inputArgs[3])
         commitsList = logCommits.split('\n')
 
         print("Coletando dados dos arquivos criados...")
@@ -40,7 +41,7 @@ else:
             linhasAdicionados = loginfoAdicionados.split('\n')
 
             if len(linhasAdicionados) > 0:
-                arquivosNovos = arquivosNovos + list(map(lambda x: foldername + x.replace('A\t','') + '#' + commit[0:8], linhasAdicionados))
+                arquivosNovos = arquivosNovos + list(map(lambda x: foldername + x.replace('A\t','') + '#' + commit[0:10], linhasAdicionados))
 
         print("Coletando dados dos arquivos modificados...")
         for commit in commitsList:
@@ -48,7 +49,7 @@ else:
             linhasModificados = loginfoModificados.split('\n')
 
             if len(linhasModificados) > 0:
-                arquivosModificados = arquivosModificados + list(map(lambda x: foldername + x.replace('MM\t','').replace('M\t','') + '#' + commit[0:8], linhasModificados))
+                arquivosModificados = arquivosModificados + list(map(lambda x: foldername + x.replace('MM\t','').replace('M\t','') + '#' + commit[0:10], linhasModificados))
 
         arquivosNovosSet = set(arquivosNovos)
         arquivosModificadosSet = set(arquivosModificados)

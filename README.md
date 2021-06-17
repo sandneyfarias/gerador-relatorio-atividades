@@ -14,22 +14,22 @@ Dentro do repositorio:
 
 (LINUX)
 ```
-python3 /home/gerador-relatorio-atividades.py <data-do-commit-inicial> <chavec>
+python3 /home/gerador-relatorio-atividades.py <data-do-commit-inicial> <data-do-commit-final> <chavec>
  ```
 (WINDOWS)
 ```
-python c:\Projetos\gerador-relatorio-atividades\gerador-relatorio-atividades.py <data-do-commit-inicial> <chavec>
+python c:\Projetos\gerador-relatorio-atividades\gerador-relatorio-atividades.py <data-do-commit-inicial> <data-do-commit-final> <chavec>
  ```
 
  Exemplo:
 
  (LINUX)
 ```
-python3 /home/gerador-relatorio-atividades 2021-06-16 C12345678
+python3 /home/gerador-relatorio-atividades 2021-06-01 2021-06-17 C12345678
 ```
  (WINDOWS)
 ```
-python3 c:\Projetos\gerador-relatorio-atividades\gerador-relatorio-atividades.py 2021-06-16 C12345678
+python3 c:\Projetos\gerador-relatorio-atividades\gerador-relatorio-atividades.py 2021-06-01 2021-06-17 C12345678
 ```
 Retorno: 
 ```
