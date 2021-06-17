@@ -29,7 +29,7 @@ python3 /home/gerador-relatorio-atividades 2021-06-01 2021-06-17 C12345678
 ```
  (WINDOWS)
 ```
-python3 c:\Projetos\gerador-relatorio-atividades\gerador-relatorio-atividades.py 2021-06-01 2021-06-17 C12345678
+python c:\Projetos\gerador-relatorio-atividades\gerador-relatorio-atividades.py 2021-06-01 2021-06-17 C12345678
 ```
 Retorno: 
 ```
