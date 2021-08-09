@@ -29,8 +29,12 @@ def montarFiltroLog(args):
     if (len(filtro) > 0):
         filtro.append("--pretty=format:%H")
 
+    return filtro
+
 def isArgumentoInformado(args):
     return (args.start_date or args.end_date or args.key or args.hash)
+
+
 
 # Definição dos argumentos de filtro
 parser = argparse.ArgumentParser()
@@ -55,8 +59,8 @@ else:
 
     if (inputArgs.hash):
         print("Coletando dados dos arquivos criados...")
-        loginfoAdicionados = g.execute(
-            ["git", "show", str(inputArgs.hash), "--name-status", "--pretty=oneline", "--abbrev-commit", "--diff-filter=A"])
+
+        loginfoAdicionados = g.execute(["git", "show", str(inputArgs.hash), "--name-status", "--pretty=oneline", "--abbrev-commit", "--diff-filter=A"])
         linhasAdicionados = loginfoAdicionados.splitlines()
 
         if len(linhasAdicionados) > 0:
@@ -64,8 +68,8 @@ else:
                 map(lambda x: foldername + x.replace('A\t', '') + '#' + str(inputArgs.hash)[0:10], linhasAdicionados))
 
         print("Coletando dados dos arquivos modificados...")
-        loginfoModificados = g.execute(
-            ["git", "show", str(inputArgs.hash), "--name-status", "--pretty=oneline", "--abbrev-commit", "--diff-filter=M"])
+
+        loginfoModificados = g.execute(["git", "show", str(inputArgs.hash), "--name-status", "--pretty=oneline", "--abbrev-commit", "--diff-filter=M"])
         linhasModificados = loginfoModificados.splitlines()
 
         if len(linhasModificados) > 0:
@@ -116,12 +120,12 @@ else:
         validateDate(inputArgs.start_date)
         validateDate(inputArgs.end_date)
         validateChave(inputArgs.key)
-
         filtroLog = montarFiltroLog(inputArgs)
 
         try:
-            logCommits = g.log(filtroLog)
+            logCommits = g.log(tuple(filtroLog))
             commitsList = logCommits.splitlines()
+            print("Total de COMMITS encontrados: {}".format(len(commitsList)))
 
             print("Coletando dados dos arquivos criados...")
             for commit in commitsList:
