@@ -19,6 +19,10 @@ def validateChave(chave):
 
 def montarFiltroLog(args):
     filtro = []
+    filtro.append("git")
+    filtro.append("rev-list")
+    filtro.append("--remotes")
+
     if (args.start_date):
         filtro.append('--after=' + str(args.start_date) + 'T00:00:01')
     if (args.end_date):
@@ -26,8 +30,8 @@ def montarFiltroLog(args):
     if (args.key):
         filtro.append('--author=' + args.key)
 
-    if (len(filtro) > 0):
-        filtro.append("--pretty=format:%H")
+    # if (len(filtro) > 0):
+    #     filtro.append("--pretty=format:%H")
 
     return filtro
 
@@ -123,9 +127,15 @@ else:
         filtroLog = montarFiltroLog(inputArgs)
 
         try:
-            logCommits = g.log(tuple(filtroLog))
+            logCommits = g.execute(filtroLog)
+            print("="*40)
+            print("COMMITS ENCONTRADOS")
+            print("="*40)
+            print(logCommits)
             commitsList = logCommits.splitlines()
-            print("Total de COMMITS encontrados: {}".format(len(commitsList)))
+            print("="*40)
+            print("Total de COMMITS: {}".format(len(commitsList)))
+            print("="*40)
 
             print("Coletando dados dos arquivos criados...")
             for commit in commitsList:
@@ -162,7 +172,9 @@ else:
             arquivosNovos.sort(key=lambda f: os.path.splitext(f)[1])
             arquivosModificados.sort(key=lambda f: os.path.splitext(f)[1])
 
-            print('_______________Arquivos Novos_______________')
+            print("="*40)
+            print('_____________Arquivos Novos_____________')
+            print("="*40)
             extensaoAnterior = ''
             for x in arquivosNovos:
                 extensao = os.path.splitext(x)[1].split('#')[0]
@@ -172,7 +184,9 @@ else:
                 if (extensao != ""):
                     print(x.strip(" "))
 
-            print('_______________Arquivos Modificados_______________')
+            print("="*40)
+            print('__________Arquivos Modificados__________')
+            print("="*40)
             extensaoAnterior = ''
             for x in arquivosModificados:
                 extensao = os.path.splitext(x)[1].split('#')[0]

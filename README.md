@@ -6,30 +6,40 @@ Este script auxilia na geração do relatorio de atividades de empresas terceiri
 Se o arquivo foi criado e então modificado, o modificado será eliminado da listagem.
 Os arquivos são retornados organizados através da sua extensão agrupados por Arquivos Novos e Arquivos Modificados.
 
-O script recebe como parâmetros a data a partir da qual os commits devem ser tratados e a chave C do usuário.
+O script recebe recebe os parâmetros:
+
+--start-date: Considera os commits a partir da data indicada. Formato yyyy-mm-dd;
+
+--end-data: Considera os commits até a data indicada. Formato yyyy-mm-dd;
+
+--key: Chave C do autor do commit;
+
+--hash: Considera apenas os commits feitos com o hash específicado. Este filtro é exclusivo, quando informado os demais parâmetros 
+são desconsiderados.
 
 O projeto utiliza biblioteca GitPython, as orientações para instalação estão disponíveis em https://pypi.org/project/GitPython/. Mais informações sobre a biblioteca podem ser encontradas em https://github.com/gitpython-developers/GitPython e https://gitpython.readthedocs.io/en/stable/
 
-Dentro do repositorio:
+Dentro do repositorio (pasta do projeto clonado):
 
 (LINUX)
 ```
-python3 /home/gerador-relatorio-atividades.py <data-do-commit-inicial> <data-do-commit-final> <chavec>
+python3 /home/gerador-relatorio-atividades.py [<--start-date DATA INICIAL> <--end-date DATA FINAL> <--key CHAVE>] [<--hash HASH>]
  ```
+
 (WINDOWS)
 ```
-python c:\Projetos\gerador-relatorio-atividades\gerador-relatorio-atividades.py <data-do-commit-inicial> <data-do-commit-final> <chavec>
+python c:\Projetos\gerador-relatorio-atividades\gerador-relatorio-atividades.py [<--start-date DATA INICIAL> <--end-date DATA FINAL> <--key CHAVE>] [<--hash HASH>]
  ```
 
  Exemplo:
 
  (LINUX)
 ```
-python3 /home/gerador-relatorio-atividades 2021-06-01 2021-06-17 C12345678
+python3 /home/gerador-relatorio-atividades --start-date 2021-06-01 --end-date 2021-06-17 --key C12345678
 ```
  (WINDOWS)
 ```
-python c:\Projetos\gerador-relatorio-atividades\gerador-relatorio-atividades.py 2021-06-01 2021-06-17 C12345678
+python c:\Projetos\gerador-relatorio-atividades\gerador-relatorio-atividades.py --start-date 2021-06-01 --end-date 2021-06-17 --key C12345678
 ```
 Retorno: 
 ```
